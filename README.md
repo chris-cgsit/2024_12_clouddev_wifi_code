@@ -6,4 +6,6 @@ Christian Schaefer
 cgs@cgs.at
 +43 650 944 699 0 
 
+# Quarkus beispiele
+https://github.com/chris-cgsit/jee_microservices_training_next
 
