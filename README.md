@@ -1,2 +1,9 @@
-# 2024_12_clouddev_wifi_code
-chris-cgsit/2024_12_clouddev_wifi_code WIFI Cloud Dev Training Unterlagen 2024 12 
+# Unterlagen Kurs Wifi Cloud Development 2024_12
+
+## Kontakt Daten
+
+Christian Schaefer
+cgs@cgs.at
++43 650 944 699 0 
+
+
