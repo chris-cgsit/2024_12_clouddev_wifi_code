@@ -6,6 +6,11 @@ Christian Schaefer
 cgs@cgs.at
 +43 650 944 699 0 
 
-# Quarkus beispiele
+# Demo Projekt aus dem laufenden Kurs findet ihr hier
+
+https://github.com/chris-cgsit/2024_12_clouddev_quarkus_code
+
+
+# Quarkus Code und Entwicklungs-Beispiele
 https://github.com/chris-cgsit/jee_microservices_training_next
 
