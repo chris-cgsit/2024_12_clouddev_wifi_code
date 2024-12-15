@@ -1,5 +1,3 @@
- <script src="https://www.google.com/recaptcha/api.js"></script>
-
 # Unterlagen Kurs Wifi Cloud Development 2024_12
 
 ## Kontakt Daten
@@ -91,3 +89,4 @@ https://github.com/CGS-IT/jee_microservices_training_matierials_2023/tree/main/J
 
 
 
+<script src="https://www.google.com/recaptcha/api.js"></script>
