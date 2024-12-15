@@ -56,11 +56,23 @@
 # Kursübersicht
 [Übersicht](005_books/0000_CGS_IT_Wifi_Java_DevOps_Cloud_Development_Übersicht.docx)
 
+# Laufende Mitschrift 2024-12
+[Übersicht](005_books/00000_laufende_Mitschrift.docx)
+
+# Workshop Dokumentation Übersicht 
+[Übersicht](005_books/Wifi_Java_DevOps_Cloud_Kursunterlagen_v_1.0.6.pdf)
+
+# Demo Application - Dokumentation und Konzepte
+[Übersicht](005_books/Wifi_Java_DevOps_Cloud_Demo_App_v_1.0.6.pdf)
 
 # Demo Projekt aus dem laufenden Kurs findet ihr hier
-
 https://github.com/chris-cgsit/2024_12_clouddev_quarkus_code
 
+# Power Point Slides und PPT Dokumenationen
+[Übersicht](020_slides)
+
+# Scripts - Ansible, Terraform und AWS Scripts
+[Übersicht](200_scripts)
 
 # Quarkus Code und Entwicklungs-Beispiele
 https://github.com/chris-cgsit/jee_microservices_training_next
