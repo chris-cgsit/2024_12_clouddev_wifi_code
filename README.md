@@ -60,6 +60,9 @@ https://github.com/chris-cgsit/2024_12_clouddev_quarkus_code
 # Quarkus Code und Entwicklungs-Beispiele
 https://github.com/chris-cgsit/jee_microservices_training_next
 
+# Quarkus Microservices Slides and Documentation / Unterlagen
+https://github.com/CGS-IT/jee_microservices_training_matierials_2023/tree/main/JEE_Microservices_v_1_0_11
+
 
 <p style="text-align: center;">
   <img src="https://raw.githubusercontent.com/chris-cgsit/cgs-it-items-public/main/images/cgsit-logo/Logo-JPEG-small.png" alt="CGS IT Logo" style="width: 160px;"/>
