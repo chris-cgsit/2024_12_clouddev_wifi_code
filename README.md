@@ -1,4 +1,5 @@
-# Unterlagen Kurs Wifi Cloud Development 2024_12
+# Unterlagen Kurs Wifi Cloud Development 2024_12 
+version ready 15.12.2024 
 
 ## Kontakt Daten
 
