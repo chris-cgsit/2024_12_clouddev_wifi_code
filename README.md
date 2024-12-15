@@ -53,6 +53,9 @@
 
 ## Kursbeschreibung
 
+# Kursübersicht
+[Übersicht](005_books/0000_CGS_IT_Wifi_Java_DevOps_Cloud_Development_Übersicht.docx)
+
 
 # Demo Projekt aus dem laufenden Kurs findet ihr hier
 
