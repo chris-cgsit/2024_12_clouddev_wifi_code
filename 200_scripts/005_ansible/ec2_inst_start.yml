@@ -1,0 +1,80 @@
+# AWS playbook : Create Simple AWS Instance with my_aws key and security group
+---
+ - name: Access instance with TAGS
+   hosts: localhost
+   connection: local
+   gather_facts: false
+
+   vars:
+     key_name: my_aws
+     region: eu-central-1
+
+   tasks: # ansible-playbook ec2_inst_start.yml --ask-vault-pass --extra-vars "taginput=devops_app_001-tag" --tags stop
+   - name: Facts
+     block:
+     - name: Locate instance id with tags
+       ec2_instance_info:
+         aws_access_key: "{{ec2_access_key}}"
+         aws_secret_key: "{{ec2_secret_key}}"
+         region: "{{ region }}"
+         filters:
+            "tag:Name": "{{taginput}}" # "devops_app_*-tag"
+       register: ec2_info
+     - name: Displaying output
+       debug:
+          msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public DNS: {{ item.public_dns_name }}"
+       loop: "{{ ec2_info.instances }}"
+       loop_control:
+         label:  "{{ item.instance_id }}"
+     tags:
+     - always
+
+   - name: Start ec2 instance block
+     block:
+     - name: Start ec2 instance
+       ec2:
+         aws_access_key: "{{ec2_access_key}}"
+         aws_secret_key: "{{ec2_secret_key}}"
+         instance_ids:  "{{ item.instance_id }}"
+         region: "{{ region }}"
+         state: running
+         wait: yes
+       loop: "{{ ec2_info.instances }}"
+       loop_control:
+         label: "{{ item.instance_id }}"
+     - name: debug output status
+       debug:
+         msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public DNS: {{ item.public_dns_name }}"
+       loop: "{{ ec2_info.instances }}"
+       loop_control:
+         label: "{{ item.instance_id }}"
+     tags: ['never', 'start']
+
+   - name: Stop ec2 instance
+     ec2:
+       aws_access_key: "{{ec2_access_key}}"
+       aws_secret_key: "{{ec2_secret_key}}"
+       instance_ids: "{{ item.instance_id }}"
+       region: "{{ region }}"
+       state: stopped
+       wait: yes
+     loop: "{{ ec2_info.instances }}"
+     loop_control:
+       label: "{{ item.instance_id }}"
+     tags: ['never', 'stop']
+
+   - name: Terminate ec2 instance
+     ec2:
+       aws_access_key: "{{ec2_access_key}}"
+       aws_secret_key: "{{ec2_secret_key}}"
+       instance_ids: "{{ item.instance_id }}"
+       region: "{{ region }}"
+       state: absent
+       wait: yes
+     loop: "{{ ec2_info.instances }}"
+     loop_control:
+       label: "{{ item.instance_id }}"
+     tags: ['never', 'terminate']
+
+
+

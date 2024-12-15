@@ -1,0 +1,9 @@
+---
+- name: My task
+  hosts: demo1
+  remote_user: ec2-user # ubuntu
+
+  tasks:
+   - name: creating a file on all registred hosts
+     command: "touch /tmp/ansible_was_here"
+

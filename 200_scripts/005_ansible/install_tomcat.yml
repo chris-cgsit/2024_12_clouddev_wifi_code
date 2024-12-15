@@ -1,0 +1,21 @@
+# tomcat setup 
+---
+- hosts: myapp
+  remote_user: ec2-user
+  # become_user: root
+  become: true
+  vars:
+    tomcat_version: 8.5.23
+    
+    tomcat_permissions_production: True
+    
+    tomcat_users:
+     - username: "tomcat"
+       password: "start123"
+       roles: "tomcat,admin,manager,manager-gui"
+     - username: "exampleuser"
+       password: "start123"
+       roles: "tomcat"
+  roles:
+   - role: zaxos.tomcat-ansible-role
+

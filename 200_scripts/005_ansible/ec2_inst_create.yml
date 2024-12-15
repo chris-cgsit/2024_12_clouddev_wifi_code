@@ -1,0 +1,114 @@
+# AWS playbook : Create Simple AWS Instance with my_aws key and security group 
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+
+  vars:
+    key_name: my_aws_rsa
+    region: eu-central-1
+    # ami-06ec8443c2a35b0ba red hat enterprise linux 8
+    # ami-0bd99ef9eccfee250 Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+    # image: ami-0a49b025fffbbdac6 # amazon ami : ami-07df274a488ca9195   # ami-0f93b5fd8f220e428 # https://cloud-images.ubuntu.com/locator/ec2/
+    image: ami-0bd99ef9eccfee250
+    id: "{{ my_inst_name }}"              # "jenkins-006"
+    sec_group: "{{ id }}-sec"
+
+  tasks:
+
+    - name: Facts
+      block:
+        # ec2_instance_facts was deprecated use ec2_instance_info
+      - name: Get instances facts
+        ec2_instance_info:
+         aws_access_key: "{{ec2_access_key}}"
+         aws_secret_key: "{{ec2_secret_key}}"
+         region: "{{ region }}"
+        register: result
+        
+      - name: Instances ID
+        debug:
+          msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public DNS: {{ item.public_dns_name }}"
+        loop: "{{ result.instances }}"
+      tags: always
+
+    - name: Provisioning EC2 instances
+      block:
+
+      - name: Upload public key to AWS
+        ec2_key:
+          name: "{{ key_name }}"
+          key_material: "{{ lookup('file', '~/.ssh/{{ key_name }}.pub') }}"
+          region: "{{ region }}"
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+
+      - name: Create security group
+        ec2_group:
+          name: "{{ sec_group }}"
+          description: "Sec Gruppe for app {{ id }}"
+          # vpc_id: 12345
+          region: "{{ region }}"
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+          rules:
+            - proto: tcp
+              ports:
+                - 22
+              cidr_ip: 0.0.0.0/0
+              rule_desc: allow all on ssh port
+            - proto: tcp
+              ports:
+                - 80
+                - 443
+                - 8080-9999
+              cidr_ip: 0.0.0.0/0    
+              rule_desc: allow https ports and proxy ports
+            - proto: icmp
+              from_port: -1
+              to_port: -1
+        register: result_sec_group
+
+      - name: Provision instance(s)
+        ec2:
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+          key_name: "{{ key_name }}"
+          id: "{{ id }}"
+          group_id: "{{ result_sec_group.group_id }}"
+          image: "{{ image }}"
+          instance_type: t2.small
+          region: "{{ region }}"
+          wait: true
+          count: 1
+          # assign_public_ip: yes == assign_public_ip only available with vpc_subnet_id
+          count_tag:
+            Name: simple_test_name
+          instance_tags:
+            Name: "{{ id }}-tag"
+          monitoring: yes
+          vpc_subnet_id: subnet-a251bede
+          assign_public_ip: yes
+        register: ec2inst
+
+        #- name: allocate a new elastic IP and associate it with an instance
+        #ec2_eip:
+        # device_id: "{{ item.instance_id }}"
+        #with_items: "{{ ec2inst.instances }}" 
+
+      tags: ['never', 'create_ec2']
+
+#      - name: Wait for SSH to come up
+#        wait_for:
+#          host: "{{ item.public_dns_name }}"
+#          port: 22
+#          delay: 60
+#          timeout: 320
+#          state: started
+#          with_items: "{{ ec2.instances }}"
+#          
+
+
+
+

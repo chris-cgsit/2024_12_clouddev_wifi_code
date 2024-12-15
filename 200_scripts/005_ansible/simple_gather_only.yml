@@ -1,0 +1,8 @@
+# Target Playbook
+---
+ - hosts: developers
+ - user: ec2-user # ansible
+ - become: yes
+ - connection: ssh
+ - gather_facts: yes
+

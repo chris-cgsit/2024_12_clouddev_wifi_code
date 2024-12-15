@@ -1,0 +1,20 @@
+
+ssh -i ~/.ssh/my_aws_rsa ubuntu@ec2-3-124-117-85.eu-central-1.compute.amazonaws.com
+
+wget https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.tar.gz
+
+sudo tar xf apache-maven-*.tar.gz -C /opt
+
+
+sudo nano /etc/profile.d/maven.sh
+
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export M2_HOME=/opt/maven
+export MAVEN_HOME=/opt/maven
+export PATH=${M2_HOME}/bin:${PATH}
+
+sudo chmod +x /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+
+sudo ln -s /opt/apache-maven-3.8.4 /opt/maven
+

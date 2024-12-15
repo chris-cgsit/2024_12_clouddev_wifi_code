@@ -1,0 +1,115 @@
+---
+- hosts: jenkins_test
+  become: yes
+  remote_user: ec2-user
+  become_user: root
+
+  vars:
+    admin_user_pass: start123
+    jenkins_plugins:
+     - workflow-multibranch-plugin
+     - build-pipeline-plugin
+
+  tasks:
+  - name: Download Long Term Jenkins release
+    get_url:
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+
+  - name: Import jenkins key from url
+    ansible.builtin.rpm_key:
+      state: present
+      key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+  - name: yum update
+    yum:
+      name: '*'
+      state: latest
+
+  - name: yum epel-release
+    command: amazon-linux-extras install epel -y
+    # args:
+    #  creates: /var/lib/yum/repos/x86_64/2/epel
+
+#  - name: yum epel-release
+#    yum:
+#      name: epel-release
+#      state: present
+
+  - name: yum install daemonize
+    yum:
+      name: daemonize
+      state: present
+
+  - name: Install java
+    yum:
+      name: java-devel  # java-11-openjdk-devel
+      state: present
+
+  - name: Install git
+    yum:
+      name: git
+      state: present
+
+  - name: Install jenkins
+    yum:
+      name: jenkins
+      state: latest
+
+  - name: daemon-reload to pick up config changes
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Start jenkins
+    ansible.builtin.systemd:
+      name: jenkins
+      state: started
+
+  - pause: seconds=30
+
+  - name: read admin pwd
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    register: adminpwd
+    
+  - name: print admin pass for initial login  
+    debug: 
+      msg: "admin pass {{adminpwd}} "
+
+  - name: unlock and add admin user
+    jenkins_script:
+     script: |
+      import jenkins.model.*
+      import hudson.security.*
+      def instance = Jenkins.getInstance()
+      def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+      hudsonRealm.createAccount('jenkins', '${user_pwd}')
+      instance.setSecurityRealm(hudsonRealm)
+      def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+      strategy.setAllowAnonymousRead(false)
+      instance.setAuthorizationStrategy(strategy)
+      instance.save()
+     args:
+      user_pwd: "{{ admin_user_pass }}"
+     user: admin
+     password: "{{ adminpwd.stdout }}"
+
+  - name: complete setup wizard
+    jenkins_script:
+     script: |
+      import static jenkins.model.Jenkins.instance as jenkins
+      import jenkins.install.InstallState
+      if (!jenkins.installState.isSetupComplete()) {
+        InstallState.INITIAL_SETUP_COMPLETED.initializeState()
+      }
+     user: admin
+     password: "{{ adminpwd.stdout }}"
+
+  - name: install plugin
+    jenkins_plugin:
+     name: "{{ item }}"
+     state: latest
+     url_username: admin
+     url_password: "{{ adminpwd.stdout }}"
+    with_items: "{{ jenkins_plugins }}"
+
+

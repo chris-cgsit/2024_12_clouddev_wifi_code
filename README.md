@@ -1,3 +1,5 @@
+ <script src="https://www.google.com/recaptcha/api.js"></script>
+
 # Unterlagen Kurs Wifi Cloud Development 2024_12
 
 ## Kontakt Daten

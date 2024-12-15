@@ -1,0 +1,87 @@
+# AWS playbook : Create Simple AWS Instance with my_aws key and security group 
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+
+  vars:
+    key_name: my_aws
+    region: eu-central-1
+    image: ami-07df274a488ca9195   # ami-0f93b5fd8f220e428 # https://cloud-images.ubuntu.com/locator/ec2/
+    id: "simple-test"
+    sec_group: "{{ id }}-sec"
+
+  tasks:
+
+    - name: Facts
+      block:
+        # ec2_instance_facts was deprecated use ec2_instance_info
+      - name: Get instances facts
+        ec2_instance_info:
+         aws_access_key: "{{ec2_access_key}}"
+         aws_secret_key: "{{ec2_secret_key}}"
+         region: "{{ region }}"
+        register: result
+        
+      - name: Instances ID
+        debug:
+          msg: "ID: {{ item.instance_id }} - State: {{ item.state.name }} - Public DNS: {{ item.public_dns_name }}"
+        loop: "{{ result.instances }}"
+      tags: always
+
+
+    - name: Provisioning EC2 instances
+      block:
+
+      - name: Upload public key to AWS
+        ec2_key:
+          name: "{{ key_name }}"
+          key_material: "{{ lookup('file', '/home/cgs/.ssh/{{ key_name }}.pub') }}"
+          region: "{{ region }}"
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+
+      - name: Create security group
+        ec2_group:
+          name: "{{ sec_group }}"
+          description: "Sec Gruppe for app {{ id }}"
+          # vpc_id: 12345
+          region: "{{ region }}"
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+          rules:
+            - proto: tcp
+              ports:
+                - 22
+              cidr_ip: 0.0.0.0/0
+              rule_desc: allow all on ssh port
+            - proto: tcp
+              ports:
+                - 80
+                - 443
+                - 8080-9999
+              cidr_ip: 0.0.0.0/0    
+              rule_desc: allow https ports and proxy ports
+        register: result_sec_group
+
+      - name: Provision instance(s)
+        ec2:
+          aws_access_key: "{{ec2_access_key}}"
+          aws_secret_key: "{{ec2_secret_key}}"
+          key_name: "{{ key_name }}"
+          id: "{{ id }}"
+          group_id: "{{ result_sec_group.group_id }}"
+          image: "{{ image }}"
+          instance_type: t2.micro
+          region: "{{ region }}"
+          wait: true
+          count: 1
+          # assign_public_ip: yes == assign_public_ip only available with vpc_subnet_id
+          count_tag:
+            Name: simple_test_name
+          instance_tags:
+            Name: simple_test_instance_tag
+
+      tags: ['never', 'create_ec2']
+     

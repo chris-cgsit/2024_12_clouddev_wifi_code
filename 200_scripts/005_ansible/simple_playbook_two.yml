@@ -1,0 +1,16 @@
+---
+- name: My task
+  hosts: demo1
+  remote_user: ec2-user # ubuntu
+
+  tasks:
+   - name: creating a file on all registred hosts
+     command: "touch /tmp/ansible_was_here"
+
+   # add thie host to the in memory host list here
+   - name: add host to host group 
+     add_host:
+       name: 10.0.0.14
+       groups: dynamic_group
+       foo: 42
+
